@@ -178,6 +178,9 @@ func process_data():
 				nodeData['conditions']['true'].append(connection.to)
 			elif connection.from_port == 1:
 				nodeData['conditions']['false'].append(connection.to)
+		elif ('Expression' in connection.from) and ('Condition' in connection.to) and connection.to_port == 1:
+			var conditionData = data[connection.to]
+			conditionData['logic'] = connection.from
 		else:
 			nodeData['connects_to'].append(connection.to)
 
@@ -227,15 +230,13 @@ func _open_whiskers(path):
 				for true_node in connectTo['true']:
 					connect_node(nodeDataKeys[i], 0, true_node, 0) 
 				for false_node in connectTo['false']:
-					connect_node(nodeDataKeys[i], 1, false_node, 0) 
+					connect_node(nodeDataKeys[i], 1, false_node, 0)
+				connect_node(loadData[nodeDataKeys[i]]['logic'], 0, nodeDataKeys[i], 1)
 			else:
 				connectTo = loadData[nodeDataKeys[i]]['connects_to']
 				# for each key
 				for x in range(0, connectTo.size()):
-					if 'Expression' in nodeDataKeys[i]:
-						connect_node(nodeDataKeys[i], 0, connectTo[x], 1)
-					else:
-						connect_node(nodeDataKeys[i], 0, connectTo[x], 0)
+					connect_node(nodeDataKeys[i], 0, connectTo[x], 0)
 	
 	var startOffset = self.get_node('Start').offset
 	var graphRect = self.rect_size
