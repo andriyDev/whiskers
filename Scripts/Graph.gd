@@ -135,67 +135,51 @@ func process_data():
 		'name': get_node("../../Info/Info/Name/Input").get_text(),
 		'display_name': get_node("../../Info/Info/DName/Input").get_text(),
 	}
-	# lets save our GraphNodes!
-	for i in range(0, connectionList.size()):
-		var name = connectionList[i].from
+	
+	# Iterate through all connections and get every node name (uniquely).
+	var nodeNames = {}
+	for connection in connectionList:
+		nodeNames[connection.to] = true
+		nodeNames[connection.from] = true
+	
+	for nodeName in nodeNames:
 		# Our schema
-		var tempData = {
-				'text':"",
-				'connects_to':[],
-				'logic':"",
-				'conditions':{
-					'true':[],
-					'false':[]
-				},
-				'location':"",
-				'size':""
+		var nodeData = {
+			'text':"",
+			'connects_to':[],
+			'logic':"",
+			'conditions':{
+				'true':[],
+				'false':[]
+			},
+			'location':"",
+			'size':""
 		}
-		var currentCTSize = 0
-		var currentConnectsTo 
-		if name in data:
-			currentCTSize = data[name]['connects_to'].size()
-			currentConnectsTo = data[name]['connects_to']
+		data[nodeName] = nodeData
+		
+		var node = self.get_node(nodeName)
 		
 		# are we a node with a text field?
-		if ('Dialogue' in name) or ('Option' in name) or ('Expression' in name) or ('Jump' in name) or ('Comment' in name):
-			tempData['text'] = self.get_node(name).get_node('Lines').get_child(0).get_text()
-		
+		if ('Dialogue' in nodeName) or ('Option' in nodeName) or ('Expression' in nodeName) or ('Jump' in nodeName) or ('Comment' in nodeName):
+			nodeData['text'] = node.get_node('Lines').get_child(0).get_text()
 		# are we an Expression Node? We should store the value in our logic field
-		if ('Expression' in name):
-			tempData['logic'] = self.get_node(name).get_node('Lines').get_child(0).get_text()
-		
-		if ('Condition' in name):
-			if name in data:
-				tempData['conditions'] = data[name]['conditions']
-			if connectionList[i]['from_port'] == 0:
-				tempData['conditions']['true'].append(connectionList[i].to)
-			if connectionList[i]['from_port'] == 1:
-				tempData['conditions']['false'].append(connectionList[i].to)
-		else:
-			if currentConnectsTo:
-				tempData['connects_to'] = currentConnectsTo
-			if not connectionList[i].to in tempData['connects_to']:
-				tempData['connects_to'].append(connectionList[i].to)
+		if ('Expression' in nodeName):
+			nodeData['logic'] = node.get_node('Lines').get_child(0).get_text()
 		
 		# store our location
-		tempData['location'] = self.get_node(name).get_offset()
-		
+		nodeData['location'] = node.get_offset()
 		# store our size
-		tempData['size'] = self.get_node(name).get_rect() 
-		
-		# are we connecting to an 'End' node?
-		if 'End' in connectionList[i].to:
-			# we should store the data!
-			data[connectionList[i].to] = {
-					'text':"",
-					'connects_to':{},
-					'logic':"",
-					'conditions':{},
-					'location':self.get_node(connectionList[i].to).get_offset()
-			}
-		
-		# save this in our processed object
-		data[name] = tempData
+		nodeData['size'] = node.get_rect()
+	
+	for connection in connectionList:
+		var nodeData = data[connection.from]
+		if ('Condition' in connection.from):
+			if connection.from_port == 0:
+				nodeData['conditions']['true'].append(connection.to)
+			elif connection.from_port == 1:
+				nodeData['conditions']['false'].append(connection.to)
+		else:
+			nodeData['connects_to'].append(connection.to)
 
 func _save_whiskers(path):
 	process_data()

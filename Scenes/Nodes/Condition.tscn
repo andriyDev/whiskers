@@ -43,7 +43,6 @@ slot/2/right_color = Color( 1, 1, 1, 1 )
 script = ExtResource( 3 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-editor/display_folded = true
 margin_left = 10.0
 margin_top = 33.0
 margin_right = 163.0
@@ -52,7 +51,6 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="HBoxContainer"]
-editor/display_folded = true
 margin_right = 34.0
 margin_bottom = 14.0
 size_flags_vertical = 0
@@ -63,7 +61,6 @@ margin_bottom = 14.0
 text = "Input"
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="HBoxContainer"]
-editor/display_folded = true
 margin_left = 127.0
 margin_right = 153.0
 margin_bottom = 14.0
